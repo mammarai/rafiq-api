@@ -33,6 +33,7 @@
     "@types/lodash": "^4.14.192",
     "@types/mongoose": "^5.11.97",
     "@types/multer": "^1.4.7",
+    "@types/pdf-parse": "^1.1.1",
     "body-parser": "^1.20.2",
     "cheerio": "^1.0.0-rc.12",
     "compression": "^1.7.4",
@@ -44,7 +45,7 @@
     "mongoose": "^7.0.3",
     "multer": "^1.4.5-lts.1",
     "node-spider": "^1.4.1",
-    "pdf-lib": "^1.17.1",
+    "pdf-parse": "^1.1.1",
     "turndown": "^7.1.2"
   }
 }
