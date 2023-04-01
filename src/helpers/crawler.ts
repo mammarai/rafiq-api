@@ -1,8 +1,8 @@
 //@ts-ignore
-import * as Spider from "node-spider";
+import Spider from "node-spider";
 //@ts-ignore
-import * as TurndownService from "turndown";
-import * as cheerio from "cheerio";
+import TurndownService from "turndown";
+import cheerio from "cheerio";
 
 const turndownService = new TurndownService();
 
