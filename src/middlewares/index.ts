@@ -1,9 +1,10 @@
 import express from "express";
 import multer from "multer";
-import { merge } from "lodash";
-import admin from "../modules/admin";
-
-const upload = multer();
+import lodashPkg from "lodash";
+const { merge, get } = lodashPkg;
+import admin from "../modules/admin.js";
+import path, { dirname } from "path";
+import { v4 as uuidv4 } from "uuid";
 
 export const isAuthenticated = async (
   req: express.Request,
@@ -24,27 +25,50 @@ export const isAuthenticated = async (
   }
 };
 
-export const multerUpload = async (
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, path.resolve(dirname("./"), "public"));
+  },
+  filename: (req, file, cb) => {
+    const extension = path.extname(file.originalname);
+    const uniqueSuffix = Date.now() + "-" + uuidv4();
+    cb(null, file.fieldname + "-" + uniqueSuffix + extension);
+  },
+});
+
+const fileFilter = (
   req: express.Request,
-  res: express.Response,
-  next: express.NextFunction
+  file: Express.Multer.File,
+  cb: multer.FileFilterCallback
 ) => {
-  try {
-    upload.fields([
-      { name: "pdf", maxCount: 1 },
-      // { name: "doc", maxCount: 10 },
-      // { name: "docx", maxCount: 1 },
-      // { name: "csv", maxCount: 1 },
-      { name: "urls", maxCount: 1 },
-    ])(req, res, (err: any) => {
-      if (err instanceof multer.MulterError) {
-        throw new Error(err.message);
-      } else if (err) {
-        throw new Error("Internal server error");
-      }
-      next();
-    });
-  } catch (err) {
-    res.status(400).json({ message: err.message });
+  const allowedMimeTypes = [
+    "application/pdf",
+    "text/csv",
+    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "application/msword",
+    "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    "text/plain",
+    "image/jpeg",
+    "image/png",
+  ];
+  if (allowedMimeTypes.includes(file.mimetype)) {
+    cb(null, true);
+  } else {
+    cb(new Error("File type not allowed."));
   }
 };
+
+const upload = multer({
+  storage,
+  fileFilter,
+});
+
+export const multerUpload = upload.fields([
+  { name: "pdf", maxCount: 5 },
+  { name: "csv", maxCount: 5 },
+  { name: "xlsx", maxCount: 5 },
+  { name: "doc", maxCount: 5 },
+  { name: "url", maxCount: 1 },
+  { name: "text", maxCount: 5 },
+  { name: "img", maxCount: 1 },
+]);
