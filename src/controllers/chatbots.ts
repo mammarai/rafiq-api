@@ -10,11 +10,44 @@ import { TextLoader } from "langchain/document_loaders";
 import { RecursiveCharacterTextSplitter } from "langchain/text_splitter";
 import { OpenAIEmbeddings } from "langchain/embeddings";
 import { PineconeStore } from "langchain/vectorstores";
-import pinecone from "../modules/pinecone.js";
+import pinecone from "../modules/pinecone.ts";
 import * as dotenv from "dotenv";
 dotenv.config();
 
 const embeddings = new OpenAIEmbeddings();
+
+const f = async (
+  file: Express.Multer.File,
+  pineconeIndex: any,
+  textSplitter: { splitDocuments: (arg0: Document[]) => any },
+  namespace: string,
+  type: number
+) => {
+  let loader: any;
+
+  switch (type) {
+    case 1:
+      loader = new PDFLoader(file.path);
+      break;
+    case 2:
+      loader = new CSVLoader(file.path);
+      break;
+    case 3:
+      loader = new DocxLoader(file.path);
+      break;
+    case 4:
+      loader = new TextLoader(file.path);
+      break;
+  }
+
+  const rawDocs = await loader.load();
+  const docs = await textSplitter.splitDocuments(rawDocs);
+  await PineconeStore.fromDocuments(docs, embeddings, {
+    pineconeIndex: pineconeIndex,
+    namespace: namespace,
+    textKey: "text",
+  });
+};
 
 export const createChatbot = async (
   req: express.Request,
@@ -46,62 +79,67 @@ export const createChatbot = async (
     }
     if (pdf) {
       pdf.forEach(async (file) => {
-        const loader = new PDFLoader(file.path);
-        const rawDocs = await loader.load();
-        const docs = await textSplitter.splitDocuments(rawDocs);
-        await PineconeStore.fromDocuments(docs, embeddings, {
-          pineconeIndex: pineconeIndex,
-          namespace: namespace,
-          textKey: "text",
-        });
+        // const loader = new PDFLoader(file.path);
+        // const rawDocs = await loader.load();
+        // const docs = await textSplitter.splitDocuments(rawDocs);
+        // await PineconeStore.fromDocuments(docs, embeddings, {
+        //   pineconeIndex: pineconeIndex,
+        //   namespace: namespace,
+        //   textKey: "text",
+        // });
+        await f(file, pineconeIndex, textSplitter, namespace, 1);
       });
     }
     if (csv) {
       csv.forEach(async (file) => {
-        const loader = new CSVLoader(file.path);
-        const rawDocs = await loader.load();
-        const docs = await textSplitter.splitDocuments(rawDocs);
-        await PineconeStore.fromDocuments(docs, embeddings, {
-          pineconeIndex: pineconeIndex,
-          namespace: namespace,
-          textKey: "text",
-        });
+        // const loader = new CSVLoader(file.path);
+        // const rawDocs = await loader.load();
+        // const docs = await textSplitter.splitDocuments(rawDocs);
+        // await PineconeStore.fromDocuments(docs, embeddings, {
+        //   pineconeIndex: pineconeIndex,
+        //   namespace: namespace,
+        //   textKey: "text",
+        // });
+        await f(file, pineconeIndex, textSplitter, namespace, 2);
       });
     }
     if (doc) {
       doc.forEach(async (file) => {
-        const loader = new DocxLoader(file.path);
-        const rawDocs = await loader.load();
-        const docs = await textSplitter.splitDocuments(rawDocs);
-        await PineconeStore.fromDocuments(docs, embeddings, {
-          pineconeIndex: pineconeIndex,
-          namespace: namespace,
-          textKey: "text",
-        });
+        // const loader = new DocxLoader(file.path);
+        // const rawDocs = await loader.load();
+        // const docs = await textSplitter.splitDocuments(rawDocs);
+        // await PineconeStore.fromDocuments(docs, embeddings, {
+        //   pineconeIndex: pineconeIndex,
+        //   namespace: namespace,
+        //   textKey: "text",
+        // });
+        await f(file, pineconeIndex, textSplitter, namespace, 3);
       });
     }
     if (docx) {
       docx.forEach(async (file) => {
-        const loader = new DocxLoader(file.path);
-        const rawDocs = await loader.load();
-        const docs = await textSplitter.splitDocuments(rawDocs);
-        await PineconeStore.fromDocuments(docs, embeddings, {
-          pineconeIndex: pineconeIndex,
-          namespace: namespace,
-          textKey: "text",
-        });
+        // const loader = new DocxLoader(file.path);
+        // const rawDocs = await loader.load();
+        // const docs = await textSplitter.splitDocuments(rawDocs);
+        // await PineconeStore.fromDocuments(docs, embeddings, {
+        //   pineconeIndex: pineconeIndex,
+        //   namespace: namespace,
+        //   textKey: "text",
+        // });
+        await f(file, pineconeIndex, textSplitter, namespace, 3);
       });
     }
-    if (docx) {
-      docx.forEach(async (file) => {
-        const loader = new TextLoader(file.path);
-        const rawDocs = await loader.load();
-        const docs = await textSplitter.splitDocuments(rawDocs);
-        await PineconeStore.fromDocuments(docs, embeddings, {
-          pineconeIndex: pineconeIndex,
-          namespace: namespace,
-          textKey: "text",
-        });
+    if (txt) {
+      txt.forEach(async (file) => {
+        // const loader = new TextLoader(file.path);
+        // const rawDocs = await loader.load();
+        // const docs = await textSplitter.splitDocuments(rawDocs);
+        // await PineconeStore.fromDocuments(docs, embeddings, {
+        //   pineconeIndex: pineconeIndex,
+        //   namespace: namespace,
+        //   textKey: "text",
+        // });
+        await f(file, pineconeIndex, textSplitter, namespace, 4);
       });
     }
   } catch (error) {
@@ -109,5 +147,3 @@ export const createChatbot = async (
     return res.sendStatus(400);
   }
 };
-  
-
