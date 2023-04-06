@@ -14,6 +14,7 @@ interface IChatbot extends Document {
   documents: IDocument[];
   multilingual: boolean;
   model: string;
+  namespace: string;
 }
 
 const documentSubSchema = new Schema<IDocument>({
@@ -51,6 +52,10 @@ const chatbotSchema = new Schema<IChatbot>({
   model: {
     type: String,
     enum: ["gpt-3.5-turbo", "gpt-4"],
+    required: true,
+  },
+  namespace: {
+    type: String,
     required: true,
   },
 });
