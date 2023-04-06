@@ -56,6 +56,7 @@
     "node-spider": "^1.4.1",
     "openai": "^3.2.1",
     "pdfjs-dist": "^3.5.141",
-    "turndown": "^7.1.2"
+    "turndown": "^7.1.2",
+    "xlsx": "^0.18.5"
   }
 }

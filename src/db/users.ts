@@ -16,7 +16,7 @@ export function newUser(values: Record<string, any>) {
   });
 }
 export function updateUserById(id: String, values: Record<string, any>) {
-  UserModel.findByIdAndUpdate(id, values);
+  UserModel.findByIdAndUpdate(id, values, { new: true });
 }
 export function getUserByEmail(email: String) {
   UserModel.findOne({ email });
